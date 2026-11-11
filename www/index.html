@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>เช็คพัสดุ - TrackThai</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Prompt,Kanit,Sarabun,system-ui,sans-serif;background:#F6F7F9;color:#0F2A44}
+#splash{position:fixed;inset:0;background:linear-gradient(180deg,#FF6B00,#FF8A00);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;color:#fff;text-align:center;padding:24px}
+#splash img{width:140px;height:140px;border-radius:32px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.spinner{width:36px;height:36px;border:4px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-top:20px}@keyframes spin{to{transform:rotate(360deg)}}
+header{background:#fff;padding:14px 16px 10px;position:sticky;top:0;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;gap:10px;align-items:center}
+header img{width:48px;height:48px;border-radius:12px}.pill{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:#FFF1E6;color:#FF6B00}.pill.premium{background:#FF6B00;color:#fff}
+main{padding:16px;max-width:520px;margin:0 auto;padding-bottom:110px}
+.card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.06);margin-bottom:14px}
+h1{font-size:22px;margin:0}h2{font-size:17px;margin:0 0 8px}h3{font-size:15px;margin:12px 0 6px}
+input,select,textarea{width:100%;padding:13px;border:1.5px solid #E2E8F0;border-radius:14px;font-size:16px;margin:6px 0;font-family:inherit}
+.btn{width:100%;padding:14px;border:0;border-radius:14px;background:#FF6B00;color:#fff;font-weight:800;font-size:16px;cursor:pointer;margin:6px 0}
+.btn.gold{background:linear-gradient(90deg,#FFB300,#FF6B00)}.btn.ghost{background:#F1F5F9;color:#0F2A44}.btn.dark{background:#0F2A44}
+.badge{display:inline-block;background:#FFF1E6;color:#FF6B00;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.timeline{border-left:3px solid #E2E8F0;margin-left:8px;padding-left:16px}.step{margin:12px 0;position:relative}.step b{color:#0F2A44}.step span{color:#64748B;font-size:13px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;box-shadow:0 -2px 12px rgba(0,0,0,.08);max-width:520px;margin:0 auto}
+nav button{flex:1;padding:12px 0;border:0;background:#fff;font-weight:700;color:#64748B;cursor:pointer}nav button.active{color:#FF6B00}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid #EDEFF2;text-align:center}th:first-child,td:first-child{text-align:left}
+.banner{background:#FEF2F2;border:1px solid #FECACA;padding:12px;border-radius:14px;margin-bottom:12px;color:#991B1B;font-weight:600}
+.banner.orange{background:#FFF7ED;border-color:#FDBA74;color:#9A3412}
+code,pre{white-space:pre-wrap;word-break:break-all;background:#0F2A44;color:#D6F0FF;padding:10px;border-radius:10px;font-size:12px;display:block;overflow:auto}
+.switch{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F1F5F9}.switch input{width:52px;accent-color:#FF6B00}
+.small{font-size:13px;color:#64748B}.hidden{display:none!important}
+</style></head>
+<body>
+<div id="splash"><img src="../assets/icon-512.png" onerror="this.src='icon.png'"><h1 style="margin:14px 0 4px">เช็คพัสดุ - TrackThai</h1><p>ติดตามพัสดุทุกขนส่ง</p><div class="spinner"></div><button onclick="hideSplash()" style="margin-top:16px;background:rgba(255,255,255,.25);border:0;color:#fff;padding:8px 18px;border-radius:999px">ข้าม</button></div>
+<header><img src="../assets/icon-512.png" onerror="this.src='icon.png'"><div style="flex:1"><b>เช็คพัสดุ - TrackThai</b><div class="small">ติดตามพัสดุทุกขนส่ง</div></div><span id="memberPill" class="pill">FREE</span></header>
+<main>
+<div id="trialBanner" class="banner orange hidden"></div>
+<div id="page-track">
+<div class="card"><h2>📦 ติดตามพัสดุ</h2><input id="trackingNo" placeholder="กรอกเลขพัสดุ เช่น TH123456789"><select id="carrier"><option value="auto">เดาอัตโนมัติ</option><option>ไปรษณีย์ไทย</option><option>Kerry Express</option><option>Flash Express</option><option>J&T Express</option><option>DHL Express</option><option>FedEx</option><option>UPS</option><option>Ninja Van</option><option>Best Express</option><option>Shopee Express</option><option>Lazada Express (LEX)</option><option>SCG Express</option></select><input id="parcelName" placeholder="ชื่อพัสดุ / โน้ต (เช่น ของจาก Shopee)"><button class="btn" onclick="track()">ติดตามพัสดุ</button><button class="btn ghost" onclick="simulateStatus()">🔔 จำลองสถานะพัสดุเปลี่ยน</button></div>
+<div id="result" class="card hidden"><h2 id="rTitle"></h2><div id="rMeta" class="small"></div><div style="background:#F1F5F9;border-radius:999px;height:10px;margin:12px 0"><div id="progress" style="height:10px;background:#FF6B00;border-radius:999px;width:0%"></div></div><div class="timeline" id="timeline"></div></div>
+<div class="card"><h2>🔔 แจ้งเตือนป๊อปอัพ</h2><p class="small">สมาชิก Premium / ทดลองฟรี เท่านั้นที่จะเปิดแจ้งเตือนแบบปิดแอปก็เด้ง (FCM) ได้</p><button class="btn dark" onclick="requestNotify()">ขออนุญาตแจ้งเตือน</button><p id="notifyStatus" class="small">สถานะ: ยังไม่ขออนุญาต</p><label class="switch">แจ้งเตือนเมื่อสถานะเปลี่ยน<input type="checkbox" id="sw1" onchange="saveSettings()"></label><label class="switch">แจ้งเตือนเมื่อกำลังนำส่ง<input type="checkbox" id="sw2" onchange="saveSettings()"></label><label class="switch">แจ้งเตือนเมื่อส่งสำเร็จ<input type="checkbox" id="sw3" onchange="saveSettings()"></label><label class="switch">แจ้งเตือนแม้ปิดแอป (Background Push - FCM)<input type="checkbox" id="swBg" onchange="saveSettings()"></label><button class="btn gold" onclick="testPush()">ทดสอบส่ง Push แบบปิดแอป</button><h3>FCM Token (จำลอง)</h3><input id="fcmToken" readonly placeholder="ยังไม่มี Token"><button class="btn ghost" onclick="genToken()">สร้าง Token จำลอง</button><button class="btn ghost" onclick="copyToken()">คัดลอก Token</button></div>
+</div>
+<div id="page-history" class="hidden"><div class="card"><h2>🕘 ประวัติการค้นหา</h2><input id="searchHist" placeholder="ค้นหาในประวัติ..." oninput="renderHistory()"><div id="histList"></div><button class="btn ghost" onclick="clearHistory()">ลบประวัติทั้งหมด</button></div></div>
+<div id="page-premium" class="hidden">
+<div class="card" style="border:2px solid #FF6B00"><h2>🎁 ทดลองใช้ฟรี 3 วัน</h2><p>ใช้แจ้งเตือนป๊อปอัพครบเหมือน Premium ไม่ต้องจ่ายก่อน</p><div id="trialProgress" class="small"></div><button class="btn gold" onclick="startTrial()">เริ่มทดลองใช้ฟรี 3 วัน</button><p id="trialMsg" class="small"></p></div>
+<div class="card"><h2>👑 Premium</h2><table><tr><th>ฟีเจอร์</th><th>ฟรี</th><th>ทดลอง 3 วัน</th><th>Premium</th></tr><tr><td>ติดตามพัสดุ</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>ประวัติ</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนป๊อปอัพ</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนตอนนำส่ง</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนตอนส่งสำเร็จ</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนแม้ปิดแอป</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>โฆษณา</td><td>มี</td><td>ไม่มี</td><td>ไม่มี</td></tr></table><br><div class="card" style="background:#FFF7ED"><b>รายเดือน 30 บาท/เดือน</b><button class="btn" onclick="buy('monthly')">สมัครรายเดือน 30 บาท</button></div><div class="card" style="background:#FFF7ED;border:2px solid #FFB300"><span class="badge">คุ้มที่สุด - ลด 31%</span><br><b>รายปี 249 บาท/ปี</b><div class="small">จ่ายรายเดือน 12 เดือน = 360 บาท ประหยัด 111 บาท</div><button class="btn gold" onclick="buy('yearly')">สมัครรายปี 249 บาท</button></div><button class="btn ghost" onclick="cancelPremium()">ยกเลิก Premium (Demo)</button></div>
+<div class="card"><h2>⚙️ ตั้งค่า / ข้อมูลในเครื่อง</h2><p class="small">เก็บใน localStorage: trackthai_history, trackthai_membership, trackthai_notification_settings, trackthai_tracking_list</p><button class="btn ghost" onclick="exportData()">สำรองข้อมูล (Export)</button><textarea id="exportBox" placeholder="ข้อมูลสำรองจะแสดงตรงนี้ วางเพื่อนำเข้าก็ได้"></textarea><button class="btn ghost" onclick="importData()">นำเข้าข้อมูล (Import)</button><button class="btn ghost" onclick="wipe()">ลบข้อมูลทั้งหมดในเครื่อง</button></div>
+<div class="card"><h2>🔥 ตั้งค่า FCM สำหรับ APK</h2><p class="small">1) สร้างโปรเจกต์ Firebase 2) ใส่ google-services.json ใน android/app 3) npm install @capacitor/push-notifications @capacitor-community/fcm</p><pre>await PushNotifications.requestPermissions();
+await PushNotifications.register();
+PushNotifications.addListener('registration', t => {
+  // ส่ง t.value (FCM Token) ไปเซิร์ฟเวอร์
+});
+PushNotifications.addListener('pushNotificationReceived', n => {
+  // เด้งป๊อปอัพในแอป
+});</pre></div>
+</div>
+</main>
+<nav><button id="nav-track" class="active" onclick="show('track')">🔍 ติดตาม</button><button id="nav-history" onclick="show('history')">🕘 ประวัติ</button><button id="nav-premium" onclick="show('premium')">👑 Premium</button></nav>
+<script>
+function hideSplash(){document.getElementById('splash').style.display='none'}
+setTimeout(hideSplash,2000);
+let hist=JSON.parse(localStorage.getItem('trackthai_history')||'[]');
+let member=JSON.parse(localStorage.getItem('trackthai_membership')||'{"type":"FREE","trialUsed":false}');
+let settings=JSON.parse(localStorage.getItem('trackthai_notification_settings')||'{"sw1":true,"sw2":true,"sw3":true,"bg":false,"fcmToken":""}');
+function save(){localStorage.setItem('trackthai_history',JSON.stringify(hist));localStorage.setItem('trackthai_membership',JSON.stringify(member));localStorage.setItem('trackthai_notification_settings',JSON.stringify(settings));localStorage.setItem('trackthai_tracking_list',JSON.stringify(hist));updateUI();}
+function updateUI(){
+  let pill=document.getElementById('memberPill');let banner=document.getElementById('trialBanner');
+  let now=new Date();let trialEnd=member.trialEnd?new Date(member.trialEnd):null;
+  if(member.type==='PREMIUM'){pill.textContent='PREMIUM';pill.className='pill premium';banner.classList.add('hidden')}
+  else if(member.type==='TRIAL'&&trialEnd&&trialEnd>now){let left=Math.ceil((trialEnd-now)/86400000);pill.textContent='ทดลองฟรี เหลือ '+left+' วัน';pill.className='pill';banner.classList.remove('hidden');banner.textContent=left<=1?'ทดลองใช้ฟรีเหลืออีก '+left+' วัน! สมัคร Premium ต่อเลย 30 บาท/เดือน หรือ 249 บาท/ปี':'ทดลองใช้ฟรีเหลืออีก '+left+' วัน';document.getElementById('trialProgress').textContent='ใช้ไปแล้ว '+(3-left)+' จาก 3 วัน';}
+  else{if(member.type==='TRIAL'){member.type='FREE';save();}pill.textContent='FREE';banner.classList.add('hidden');}
+  document.getElementById('sw1').checked=settings.sw1;document.getElementById('sw2').checked=settings.sw2;document.getElementById('sw3').checked=settings.sw3;document.getElementById('swBg').checked=settings.bg;document.getElementById('fcmToken').value=settings.fcmToken||'';document.getElementById('notifyStatus').textContent='สถานะ: '+(Notification?Notification.permission:'ไม่รองรับ');renderHistory();
+}
+function show(p){['track','history','premium'].forEach(x=>{document.getElementById('page-'+x).classList.toggle('hidden',x!==p);document.getElementById('nav-'+x).classList.toggle('active',x===p);});}
+function track(){let no=document.getElementById('trackingNo').value.trim();if(!no){alert('กรอกเลขพัสดุก่อน');return;}let carrier=document.getElementById('carrier').value;if(carrier==='auto'){carrier=no.startsWith('TH')?'ไปรษณีย์ไทย':no.startsWith('FL')?'Flash Express':'Kerry Express';}let name=document.getElementById('parcelName').value||'พัสดุของฉัน';let item={no,carrier,name,time:new Date().toLocaleString('th-TH'),status:'กำลังนำส่ง'};hist.unshift(item);hist=hist.slice(0,100);save();document.getElementById('result').classList.remove('hidden');document.getElementById('rTitle').textContent='📦 '+name+' - '+no;document.getElementById('rMeta').textContent=carrier+' • '+item.time;document.getElementById('progress').style.width='75%';document.getElementById('timeline').innerHTML='<div class="step"><b>กำลังนำส่ง</b><br><span>พนักงานกำลังนำส่ง • วันนี้</span></div><div class="step"><b>ถึงศูนย์กระจายสินค้า</b><br><span>กรุงเทพฯ</span></div><div class="step"><b>รับพัสดุแล้ว</b><br><span>ต้นทาง</span></div>';if(canNotify())push('พัสดุของคุณกำลังนำส่งแล้ว','เลขพัสดุ '+no+' - '+carrier);}
+function canNotify(){return (member.type==='PREMIUM'||(member.type==='TRIAL'&&new Date(member.trialEnd)>new Date()))&&settings.sw1;}
+function simulateStatus(){if(!canNotify()){alert('ฟังก์ชันนี้สำหรับ Premium / ทดลองฟรี เท่านั้น');show('premium');return;}push('📦 สถานะพัสดุเปลี่ยน','พัสดุของคุณกำลังนำส่งแล้ว');}
+function push(t,b){if('Notification' in window&&Notification.permission==='granted'){new Notification(t,{body:b});}else{alert(t+'\n'+b);}}
+async function requestNotify(){if(!('Notification' in window)){alert('เบราว์เซอร์นี้ไม่รองรับ');return;}let p=await Notification.requestPermission();updateUI();alert('สถานะแจ้งเตือน: '+p);}
+function saveSettings(){settings.sw1=document.getElementById('sw1').checked;settings.sw2=document.getElementById('sw2').checked;settings.sw3=document.getElementById('sw3').checked;settings.bg=document.getElementById('swBg').checked;if(!canNotify()&&settings.bg){alert('ต้องเป็น Premium / ทดลองฟรี ก่อน');document.getElementById('swBg').checked=false;settings.bg=false;}save();}
+function genToken(){settings.fcmToken='fcm-demo-'+Math.random().toString(36).slice(2,12);save();alert('สร้าง FCM Token แล้ว');}
+function copyToken(){navigator.clipboard.writeText(settings.fcmToken||'');alert('คัดลอก Token แล้ว');}
+function testPush(){if(!canNotify()){alert('ต้องเป็น Premium / ทดลองฟรี ก่อน');show('premium');return;}push('📦 พัสดุของคุณกำลังนำส่งแล้ว','เลขพัสดุ TH123456789 - Flash Express • ส่งผ่าน FCM แม้ปิดแอป');alert('ส่ง Push สำเร็จ - ถ้าเป็น APK จริงจะเด้งแม้ปิดแอป');}
+function startTrial(){if(member.trialUsed){alert('คุณเคยใช้สิทธิ์ทดลองฟรีแล้ว');return;}member.type='TRIAL';member.trialUsed=true;member.trialStart=new Date().toISOString();member.trialEnd=new Date(Date.now()+3*86400000).toISOString();save();alert('เริ่มทดลองใช้ฟรี 3 วันแล้ว!');}
+function buy(type){let days=type==='monthly'?30:365;member.type='PREMIUM';member.premiumEnd=new Date(Date.now()+days*86400000).toISOString();save();alert('สมัคร Premium สำเร็จ (Demo) - '+type);}
+function cancelPremium(){member.type='FREE';save();alert('ยกเลิก Premium แล้ว (Demo)');}
+function renderHistory(){let q=(document.getElementById('searchHist')?.value||'').toLowerCase();let el=document.getElementById('histList');if(!el)return;let list=hist.filter(h=>(h.no+h.carrier+h.name).toLowerCase().includes(q));el.innerHTML=list.map((h,i)=>'<div class="card" style="margin:8px 0"><b>'+h.name+'</b><div class="small">'+h.no+' • '+h.carrier+'</div><div class="small">'+h.time+' • '+h.status+'</div><button class="btn ghost" onclick="reuse('+hist.indexOf(h)+')">ดูอีกครั้ง</button></div>').join('')||'<p class="small">ยังไม่มีประวัติ</p>';}
+function reuse(i){document.getElementById('trackingNo').value=hist[i].no;show('track');track();}
+function clearHistory(){if(confirm('ลบประวัติทั้งหมด?')){hist=[];save();}}
+function exportData(){document.getElementById('exportBox').value=JSON.stringify({hist,member,settings},null,2);alert('คัดลอกข้อมูลในช่องไปเก็บไว้ได้เลย');}
+function importData(){try{let d=JSON.parse(document.getElementById('exportBox').value);hist=d.hist||hist;member=d.member||member;settings=d.settings||settings;save();alert('นำเข้าข้อมูลสำเร็จ');}catch(e){alert('ข้อมูลไม่ถูกต้อง');}}
+function wipe(){if(confirm('ลบข้อมูลทั้งหมดในเครื่อง?')){localStorage.removeItem('trackthai_history');localStorage.removeItem('trackthai_membership');localStorage.removeItem('trackthai_notification_settings');localStorage.removeItem('trackthai_tracking_list');location.reload();}}
+updateUI();
+</script></body></html>

@@ -1,0 +1,5 @@
+ถ้า .github อัปโหลดไม่ขึ้น ให้ทำแบบนี้:
+1. กด Commit changes หน้าแรกก่อน
+2. เข้า Repo > Add file > Upload files
+3. สร้างโฟลเดอร์โดยพิมพ์ชื่อไฟล์ว่า .github/workflows/build-apk.yml แล้วอัปโหลดไฟล์ build-apk.yml นี้
+4. กด Commit changes อีกครั้ง แล้วไปดูแท็บ Actions
