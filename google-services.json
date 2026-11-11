@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "225037686726",
+    "project_id": "trackthai-54a42",
+    "storage_bucket": "trackthai-54a42.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225037686726:android:3b1d065752a61c53ab84c7",
+        "android_client_info": {
+          "package_name": "com.trackthai.checkparcel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1rPPG8whE7cl7PjgA9nYc_Bvw6GLw_a8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
