@@ -19,6 +19,8 @@ jobs:
         run: npm install --legacy-peer-deps
       - name: Install Capacitor CLI
         run: npm install @capacitor/cli@6 --save-dev
+      - name: Install TypeScript
+        run: npm install -D typescript
       - name: Add Android
         run: npx @capacitor/cli add android || true
       - name: Sync
