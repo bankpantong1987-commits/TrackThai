@@ -16,11 +16,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
+      - name: Install Capacitor CLI
+        run: npm install @capacitor/cli@6 --save-dev
       - name: Add Android
-        run: npx cap add android || true
+        run: npx @capacitor/cli add android || true
       - name: Sync
-        run: npx cap sync android
+        run: npx @capacitor/cli sync android
       - name: Build APK
         run: |
           cd android
