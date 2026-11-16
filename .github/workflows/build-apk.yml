@@ -1,4 +1,4 @@
-name: Build AAB
+name: Build AAB for Play Store
 
 on:
   push:
@@ -10,25 +10,62 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
-      - name: Create Keystore
+          distribution: temurin
+          java-version: 17
+      - name: Install deps
+        run: |
+          npm install
+          npx cap sync android || npx cap add android
+          npx cap sync android
+      - name: Copy google-services.json
+        run: |
+          if [ -f "google-services.json" ]; then
+            cp google-services.json android/app/google-services.json
+            echo "Copied google-services.json"
+          fi
+      - name: Create Keystore and Signing
         run: |
           keytool -genkeypair -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -storepass trackthai123 -keypass trackthai123 -dname "CN=TrackThai, OU=Cafe Community, O=Cafe Community, L=Nakhon Pathom, ST=Nakhon Pathom, C=TH"
-          echo "storePassword=trackthai123" > android/key.properties
-          echo "keyPassword=trackthai123" >> android/key.properties
-          echo "keyAlias=upload" >> android/key.properties
-          echo "storeFile=upload-keystore.jks" >> android/key.properties
+          cat > android/app/key.properties <<'EOF'
+          storePassword=trackthai123
+          keyPassword=trackthai123
+          keyAlias=upload
+          storeFile=upload-keystore.jks
+          EOF
+          python3 <<'PY'
+          import pathlib
+          p = pathlib.Path("android/app/build.gradle")
+          t = p.read_text()
+          # เพิ่ม signingConfigs ถ้ายังไม่มี
+          if "signingConfigs" not in t:
+              t = t.replace("android {", "android {\n    signingConfigs {\n        release {\n            storeFile file('upload-keystore.jks')\n            storePassword 'trackthai123'\n            keyAlias 'upload'\n            keyPassword 'trackthai123'\n        }\n    }", 1)
+          # ให้ buildType release ใช้ signingConfigs.release
+          if "signingConfig signingConfigs.release" not in t:
+              t = t.replace("release {", "release {\n            signingConfig signingConfigs.release", 1)
+          p.write_text(t)
+          print("Patched build.gradle")
+          PY
       - name: Build AAB
-        run: flutter build appbundle --release
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease --stacktrace
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: TrackThai-AAB
-          path: build/app/outputs/bundle/release/app-release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+      - name: Build APK for testing
+        run: |
+          cd android
+          ./gradlew assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrackThai-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
