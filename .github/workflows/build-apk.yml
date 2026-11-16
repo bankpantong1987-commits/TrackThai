@@ -41,10 +41,8 @@ jobs:
           import pathlib, re
           p = pathlib.Path("android/app/build.gradle")
           t = p.read_text()
-          # เพิ่ม signingConfigs ถ้ายังไม่มี
           if "signingConfigs" not in t:
               t = t.replace("android {", "android {\n    signingConfigs {\n        release {\n            storeFile file('upload-keystore.jks')\n            storePassword 'trackthai123'\n            keyAlias 'upload'\n            keyPassword 'trackthai123'\n        }\n    }", 1)
-          # ให้ buildType release ใช้ signingConfigs.release - หาใน buildTypes เท่านั้น
           if "signingConfig signingConfigs.release" not in t:
               bi = t.find("buildTypes")
               if bi != -1:
@@ -52,10 +50,8 @@ jobs:
                   if ri != -1:
                       insert_at = ri + len("release {")
                       t = t[:insert_at] + "\n            signingConfig signingConfigs.release" + t[insert_at:]
-          # อัปเดต targetSdk เป็น 36 ตามที่ Google บังคับ
           t = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 36', t)
           t = re.sub(r'targetSdk\s+\d+', 'targetSdk 36', t)
-          # อัปเดตใน variables.gradle ด้วยถ้ามี
           vg = pathlib.Path("android/variables.gradle")
           if vg.exists():
               vt = vg.read_text()
@@ -70,6 +66,18 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease --stacktrace
+      - name: Export Upload Certificate PEM
+        run: |
+          keytool -export -rfc -keystore android/app/upload-keystore.jks -alias upload -file upload_certificate.pem -storepass trackthai123
+          cp android/app/upload-keystore.jks upload-keystore.jks
+          ls -lh upload_certificate.pem upload-keystore.jks
+      - name: Upload PEM and Keystore
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrackThai-Keystore-and-PEM
+          path: |
+            upload_certificate.pem
+            upload-keystore.jks
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
