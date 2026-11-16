@@ -27,19 +27,31 @@ code,pre{white-space:pre-wrap;word-break:break-all;background:#0F2A44;color:#D6F
 .small{font-size:13px;color:#64748B}.hidden{display:none!important}
 </style></head>
 <body>
-<div id="splash"><img src="../assets/icon-512.png" onerror="this.src='icon.png'"><h1 style="margin:14px 0 4px">เช็คพัสดุ - TrackThai</h1><p>ติดตามพัสดุทุกขนส่ง</p><div class="spinner"></div><button onclick="hideSplash()" style="margin-top:16px;background:rgba(255,255,255,.25);border:0;color:#fff;padding:8px 18px;border-radius:999px">ข้าม</button></div>
-<header><img src="../assets/icon-512.png" onerror="this.src='icon.png'"><div style="flex:1"><b>เช็คพัสดุ - TrackThai</b><div class="small">ติดตามพัสดุทุกขนส่ง</div></div><span id="memberPill" class="pill">FREE</span></header>
+<div id="splash"><img src="../assets/icon-512.png" onerror="this.src='icon.png'"><h1 style="margin:14px 0 4px">เช็คพัสดุ - TrackThai</h1><p>บันทึกพัสดุทุกขนส่ง</p><div class="spinner"></div><button onclick="hideSplash()" style="margin-top:16px;background:rgba(255,255,255,.25);border:0;color:#fff;padding:8px 18px;border-radius:999px">ข้าม</button></div>
+<header><img src="../assets/icon-512.png" onerror="this.src='icon.png'"><div style="flex:1"><b>เช็คพัสดุ - TrackThai</b><div class="small">บันทึกพัสดุทุกขนส่ง</div></div><span id="memberPill" class="pill">FREE</span></header>
 <main>
 <div id="trialBanner" class="banner orange hidden"></div>
 <div id="page-track">
-<div class="card"><h2>📦 ติดตามพัสดุ</h2><input id="trackingNo" placeholder="กรอกเลขพัสดุ เช่น TH123456789"><select id="carrier"><option value="auto">เดาอัตโนมัติ</option><option>ไปรษณีย์ไทย</option><option>Kerry Express</option><option>Flash Express</option><option>J&T Express</option><option>DHL Express</option><option>FedEx</option><option>UPS</option><option>Ninja Van</option><option>Best Express</option><option>Shopee Express</option><option>Lazada Express (LEX)</option><option>SCG Express</option></select><input id="parcelName" placeholder="ชื่อพัสดุ / โน้ต (เช่น ของจาก Shopee)"><button class="btn" onclick="track()">ติดตามพัสดุ</button><button class="btn ghost" onclick="simulateStatus()">🔔 จำลองสถานะพัสดุเปลี่ยน</button></div>
+<div class="card"><h2>📦 บันทึกพัสดุ</h2><input id="trackingNo" placeholder="กรอกเลขพัสดุเอง เช่น TH123456789"><select id="carrier"><option value="auto">เดาอัตโนมัติ</option><option>ไปรษณีย์ไทย</option><option>Kerry Express</option><option>Flash Express</option><option>J&T Express</option><option>DHL Express</option><option>FedEx</option><option>UPS</option><option>Ninja Van</option><option>Best Express</option><option>Shopee Express</option><option>Lazada Express (LEX)</option><option>SCG Express</option></select><input id="parcelName" placeholder="ชื่อพัสดุ / โน้ต (เช่น ของจาก Shopee)">
+      <label style="display:block;margin:12px 0 4px;font-size:14px;font-weight:bold">สถานะที่คุณรู้ (กรอกเอง)</label>
+      <select id="parcelStatus" style="width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;font-size:15px">
+        <option>รอรับพัสดุ</option>
+        <option>ร้านส่งแล้ว</option>
+        <option>กำลังเดินทาง</option>
+        <option>ถึงศูนย์กระจายสินค้า</option>
+        <option>กำลังนำส่ง</option>
+        <option>ได้รับแล้ว</option>
+      </select>
+      <label style="display:block;margin:12px 0 4px;font-size:14px;font-weight:bold">โน้ต (ไม่ใส่ก็ได้)</label>
+      <input id="parcelNote" placeholder="เช่น ของจาก Shopee - รองเท้า 250 บาท" style="width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;font-size:15px" />
+      <div id="carrierLinks"></div><button class="btn" onclick="track()">บันทึกพัสดุ</button><button class="btn ghost" onclick="simulateStatus()">🔔 จำลองสถานะพัสดุเปลี่ยน</button></div>
 <div id="result" class="card hidden"><h2 id="rTitle"></h2><div id="rMeta" class="small"></div><div style="background:#F1F5F9;border-radius:999px;height:10px;margin:12px 0"><div id="progress" style="height:10px;background:#FF6B00;border-radius:999px;width:0%"></div></div><div class="timeline" id="timeline"></div></div>
 <div class="card"><h2>🔔 แจ้งเตือนป๊อปอัพ</h2><p class="small">สมาชิก Premium / ทดลองฟรี เท่านั้นที่จะเปิดแจ้งเตือนแบบปิดแอปก็เด้ง (FCM) ได้</p><button class="btn dark" onclick="requestNotify()">ขออนุญาตแจ้งเตือน</button><p id="notifyStatus" class="small">สถานะ: ยังไม่ขออนุญาต</p><label class="switch">แจ้งเตือนเมื่อสถานะเปลี่ยน<input type="checkbox" id="sw1" onchange="saveSettings()"></label><label class="switch">แจ้งเตือนเมื่อกำลังนำส่ง<input type="checkbox" id="sw2" onchange="saveSettings()"></label><label class="switch">แจ้งเตือนเมื่อส่งสำเร็จ<input type="checkbox" id="sw3" onchange="saveSettings()"></label><label class="switch">แจ้งเตือนแม้ปิดแอป (Background Push - FCM)<input type="checkbox" id="swBg" onchange="saveSettings()"></label><button class="btn gold" onclick="testPush()">ทดสอบส่ง Push แบบปิดแอป</button><h3>FCM Token (จำลอง)</h3><input id="fcmToken" readonly placeholder="ยังไม่มี Token"><button class="btn ghost" onclick="genToken()">สร้าง Token จำลอง</button><button class="btn ghost" onclick="copyToken()">คัดลอก Token</button></div>
 </div>
 <div id="page-history" class="hidden"><div class="card"><h2>🕘 ประวัติการค้นหา</h2><input id="searchHist" placeholder="ค้นหาในประวัติ..." oninput="renderHistory()"><div id="histList"></div><button class="btn ghost" onclick="clearHistory()">ลบประวัติทั้งหมด</button></div></div>
 <div id="page-premium" class="hidden">
 <div class="card" style="border:2px solid #FF6B00"><h2>🎁 ทดลองใช้ฟรี 3 วัน</h2><p>ใช้แจ้งเตือนป๊อปอัพครบเหมือน Premium ไม่ต้องจ่ายก่อน</p><div id="trialProgress" class="small"></div><button class="btn gold" onclick="startTrial()">เริ่มทดลองใช้ฟรี 3 วัน</button><p id="trialMsg" class="small"></p></div>
-<div class="card"><h2>👑 Premium</h2><table><tr><th>ฟีเจอร์</th><th>ฟรี</th><th>ทดลอง 3 วัน</th><th>Premium</th></tr><tr><td>ติดตามพัสดุ</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>ประวัติ</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนป๊อปอัพ</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนตอนนำส่ง</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนตอนส่งสำเร็จ</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนแม้ปิดแอป</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>โฆษณา</td><td>มี</td><td>ไม่มี</td><td>ไม่มี</td></tr></table><br><div class="card" style="background:#FFF7ED"><b>รายเดือน 30 บาท/เดือน</b><button class="btn" onclick="buy('monthly')">สมัครรายเดือน 30 บาท</button></div><div class="card" style="background:#FFF7ED;border:2px solid #FFB300"><span class="badge">คุ้มที่สุด - ลด 31%</span><br><b>รายปี 249 บาท/ปี</b><div class="small">จ่ายรายเดือน 12 เดือน = 360 บาท ประหยัด 111 บาท</div><button class="btn gold" onclick="buy('yearly')">สมัครรายปี 249 บาท</button></div><button class="btn ghost" onclick="cancelPremium()">ยกเลิก Premium (Demo)</button></div>
+<div class="card"><h2>👑 Premium</h2><table><tr><th>ฟีเจอร์</th><th>ฟรี</th><th>ทดลอง 3 วัน</th><th>Premium</th></tr><tr><td>บันทึกพัสดุ</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>ประวัติ</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนป๊อปอัพ</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนตอนนำส่ง</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนตอนส่งสำเร็จ</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>แจ้งเตือนแม้ปิดแอป</td><td>❌</td><td>✅</td><td>✅</td></tr><tr><td>โฆษณา</td><td>มี</td><td>ไม่มี</td><td>ไม่มี</td></tr></table><br><div class="card" style="background:#FFF7ED"><b>รายเดือน 30 บาท/เดือน</b><button class="btn" onclick="buy('monthly')">สมัครรายเดือน 30 บาท</button></div><div class="card" style="background:#FFF7ED;border:2px solid #FFB300"><span class="badge">คุ้มที่สุด - ลด 31%</span><br><b>รายปี 249 บาท/ปี</b><div class="small">จ่ายรายเดือน 12 เดือน = 360 บาท ประหยัด 111 บาท</div><button class="btn gold" onclick="buy('yearly')">สมัครรายปี 249 บาท</button></div><button class="btn ghost" onclick="cancelPremium()">ยกเลิก Premium (Demo)</button></div>
 <div class="card"><h2>⚙️ ตั้งค่า / ข้อมูลในเครื่อง</h2><p class="small">เก็บใน localStorage: trackthai_history, trackthai_membership, trackthai_notification_settings, trackthai_tracking_list</p><button class="btn ghost" onclick="exportData()">สำรองข้อมูล (Export)</button><textarea id="exportBox" placeholder="ข้อมูลสำรองจะแสดงตรงนี้ วางเพื่อนำเข้าก็ได้"></textarea><button class="btn ghost" onclick="importData()">นำเข้าข้อมูล (Import)</button><button class="btn ghost" onclick="wipe()">ลบข้อมูลทั้งหมดในเครื่อง</button></div>
 <div class="card"><h2>🔥 ตั้งค่า FCM สำหรับ APK</h2><p class="small">1) สร้างโปรเจกต์ Firebase 2) ใส่ google-services.json ใน android/app 3) npm install @capacitor/push-notifications @capacitor-community/fcm</p><pre>await PushNotifications.requestPermissions();
 await // PushNotifications.register disabled();
@@ -68,7 +80,38 @@ function updateUI(){
   document.getElementById('sw1').checked=settings.sw1;document.getElementById('sw2').checked=settings.sw2;document.getElementById('sw3').checked=settings.sw3;document.getElementById('swBg').checked=settings.bg;document.getElementById('fcmToken').value=settings.fcmToken||'';document.getElementById('notifyStatus').textContent='สถานะ: '+((window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.PushNotifications)?'พร้อมใช้ Capacitor Push (APK)':(('Notification' in window)?Notification.permission:'ไม่รองรับ Web Notification - ใช้ Capacitor Push แทน'));renderHistory();
 }
 function show(p){['track','history','premium'].forEach(x=>{document.getElementById('page-'+x).classList.toggle('hidden',x!==p);document.getElementById('nav-'+x).classList.toggle('active',x===p);});}
-function track(){let no=document.getElementById('trackingNo').value.trim();if(!no){alert('กรอกเลขพัสดุก่อน');return;}let carrier=document.getElementById('carrier').value;if(carrier==='auto'){carrier=no.startsWith('TH')?'ไปรษณีย์ไทย':no.startsWith('FL')?'Flash Express':'Kerry Express';}let name=document.getElementById('parcelName').value||'พัสดุของฉัน';let item={no,carrier,name,time:new Date().toLocaleString('th-TH'),status:'กำลังนำส่ง'};hist.unshift(item);hist=hist.slice(0,100);save();document.getElementById('result').classList.remove('hidden');document.getElementById('rTitle').textContent='📦 '+name+' - '+no;document.getElementById('rMeta').textContent=carrier+' • '+item.time;document.getElementById('progress').style.width='75%';document.getElementById('timeline').innerHTML='<div class="step"><b>กำลังนำส่ง</b><br><span>พนักงานกำลังนำส่ง • วันนี้</span></div><div class="step"><b>ถึงศูนย์กระจายสินค้า</b><br><span>กรุงเทพฯ</span></div><div class="step"><b>รับพัสดุแล้ว</b><br><span>ต้นทาง</span></div>';if(canNotify())push('พัสดุของคุณกำลังนำส่งแล้ว','เลขพัสดุ '+no+' - '+carrier);}
+function track(){
+  let no=document.getElementById('trackingNo').value.trim();
+  if(!no){alert('กรอกเลขพัสดุเองก่อนนะครับ');return;}
+  let carrier=document.getElementById('carrier').value;
+  if(carrier==='auto'){
+    if(no.startsWith('TH')||no.startsWith('E')) carrier='ไปรษณีย์ไทย';
+    else if(no.startsWith('FL')||no.startsWith('TH0')) carrier='Flash Express';
+    else if(no.startsWith('KEX')||no.startsWith('SHP')) carrier='Kerry Express';
+    else carrier='ไม่ระบุขนส่ง';
+  }
+  let name=document.getElementById('parcelName').value.trim()||'พัสดุของฉัน';
+  let note=document.getElementById('parcelNote')?document.getElementById('parcelNote').value.trim():'';
+  let status=document.getElementById('parcelStatus')?document.getElementById('parcelStatus').value:'รอรับพัสดุ';
+  let item={no,carrier,name,note,status,time:new Date().toLocaleString('th-TH')};
+  hist.unshift(item); hist=hist.slice(0,100); save();
+  document.getElementById('result').classList.remove('hidden');
+  document.getElementById('rTitle').textContent='📦 '+name+' - '+no;
+  document.getElementById('rMeta').textContent=carrier+' • '+item.time+' • สถานะ: '+status+(note?' • โน้ต: '+note:'');
+  document.getElementById('progress').style.width='10%';
+  document.getElementById('timeline').innerHTML='<div class="step"><b>✅ บันทึกแล้ว</b><br><span>คุณกรอกเลขเอง - '+no+'<br>ขนส่ง: '+carrier+'<br>สถานะที่คุณใส่: '+status+'</span></div><div class="step"><b>วิธีเช็คสถานะจริง</b><br><span>กดปุ่ม เปิดเว็บขนส่ง ด้านล่าง แล้วใส่เลขนี้ในเว็บขนส่งได้เลย</span></div>';
+  if(canNotify()) push('บันทึกพัสดุแล้ว','เลข '+no+' - '+carrier+' • '+status);
+  // show carrier link buttons
+  let links=document.getElementById('carrierLinks');
+  if(links){
+    let q=encodeURIComponent(no);
+    links.innerHTML='<p style="margin:10px 0 6px;font-size:14px;font-weight:bold">เช็คสถานะจริงที่เว็บขนส่ง:</p>'
+    +'<button onclick="window.open(\'https://track.thailandpost.co.th/?trackNumber='+q+'\',\'_blank\')" style="width:100%;padding:10px;margin:4px 0;border-radius:10px;border:1px solid #ddd;background:#fff">📮 เปิดเว็บไปรษณีย์ไทย</button>'
+    +'<button onclick="window.open(\'https://www.flashexpress.co.th/tracking/?track='+q+'\',\'_blank\')" style="width:100%;padding:10px;margin:4px 0;border-radius:10px;border:1px solid #ddd;background:#fff">⚡ เปิดเว็บ Flash Express</button>'
+    +'<button onclick="window.open(\'https://th.kerryexpress.com/th/track/?track='+q+'\',\'_blank\')" style="width:100%;padding:10px;margin:4px 0;border-radius:10px;border:1px solid #ddd;background:#fff">🟠 เปิดเว็บ Kerry Express</button>'
+    +'<button onclick="navigator.clipboard.writeText(\''+no+'\');alert(\'คัดลอกเลขพัสดุแล้ว: '+no+'\')" style="width:100%;padding:10px;margin:4px 0;border-radius:10px;background:#111;color:#fff;border:none">📋 คัดลอกเลขพัสดุ</button>';
+  }
+}
 function canNotify(){return (member.type==='PREMIUM'||(member.type==='TRIAL'&&new Date(member.trialEnd)>new Date()))&&settings.sw1;}
 function simulateStatus(){if(!canNotify()){alert('ฟังก์ชันนี้สำหรับ Premium / ทดลองฟรี เท่านั้น');show('premium');return;}push('📦 สถานะพัสดุเปลี่ยน','พัสดุของคุณกำลังนำส่งแล้ว');}
 async function push(t,b){
@@ -115,4 +158,150 @@ function exportData(){document.getElementById('exportBox').value=JSON.stringify(
 function importData(){try{let d=JSON.parse(document.getElementById('exportBox').value);hist=d.hist||hist;member=d.member||member;settings=d.settings||settings;save();alert('นำเข้าข้อมูลสำเร็จ');}catch(e){alert('ข้อมูลไม่ถูกต้อง');}}
 function wipe(){if(confirm('ลบข้อมูลทั้งหมดในเครื่อง?')){localStorage.removeItem('trackthai_history');localStorage.removeItem('trackthai_membership');localStorage.removeItem('trackthai_notification_settings');localStorage.removeItem('trackthai_tracking_list');location.reload();}}
 updateUI();
-</script></body></html>
+</script>
+<!-- LOGIN MODAL -->
+<div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;align-items:center;justify-content:center">
+  <div style="background:#fff;width:92%;max-width:380px;border-radius:20px;padding:22px">
+    <h2 style="margin:0 0 6px">เข้าสู่ระบบ</h2><p style="color:#666;font-size:13px;margin:0 0 14px">ล็อกอินก่อนบันทึกพัสดุ / สมัคร Premium</p>
+    <label style="font-size:13px;font-weight:bold">อีเมล</label>
+    <input id="loginEmail" placeholder="you@email.com" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;margin:6px 0 10px">
+    <label style="font-size:13px;font-weight:bold">รหัสผ่าน</label>
+    <input id="loginPass" type="password" placeholder="รหัสผ่าน" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;margin:6px 0 10px">
+    <button onclick="doLoginEmail()" style="width:100%;padding:12px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:bold">สมัคร / เข้าสู่ระบบด้วยอีเมล</button>
+    <button onclick="doLoginGoogle()" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;background:#fff;margin-top:8px;font-weight:bold">G เข้าสู่ระบบด้วย Google</button>
+    <div style="display:flex;gap:8px;margin-top:8px"><input id="loginPhone" placeholder="เบอร์โทร 08x-xxx-xxxx" style="flex:1;padding:12px;border:1px solid #ddd;border-radius:12px"><button onclick="sendOTP()" style="padding:12px 14px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:bold">ส่ง OTP</button></div>
+    <div id="otpBox" style="display:none;margin-top:8px"><input id="loginOTP" placeholder="ใส่รหัส OTP (จำลอง: 123456)" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:12px"><button onclick="doLoginOTP()" style="width:100%;padding:12px;border:none;border-radius:12px;background:#16a34a;color:#fff;font-weight:bold;margin-top:8px">ยืนยัน OTP 123456</button></div>
+    <p style="font-size:12px;color:#888;text-align:center;margin:10px 0 0">โหมดจำลอง: OTP คือ 123456 เสมอ • ข้อมูลเก็บในเครื่องเท่านั้น</p>
+    <button onclick="closeLogin()" style="width:100%;padding:10px;border:none;background:none;color:#666;margin-top:6px">ปิด</button>
+  </div>
+</div>
+
+<!-- PROFILE + ADMIN -->
+<div id="profileBox" style="background:#f8fafc;border-radius:16px;padding:14px;margin:14px 0">
+  <div id="profileInfo">ยังไม่ล็อกอิน</div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button onclick="openLogin()" style="padding:10px 14px;border:none;border-radius:10px;background:#111;color:#fff;font-weight:bold">เข้าสู่ระบบ</button>
+    <button onclick="logout()" style="padding:10px 14px;border:1px solid #ddd;border-radius:10px;background:#fff">ออกจากระบบ</button>
+    <button onclick="openAdmin()" style="padding:10px 14px;border:none;border-radius:10px;background:#7c3aed;color:#fff;font-weight:bold">จัดการสมาชิก Premium (เจ้าของแอป)</button>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div id="adminModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;overflow:auto">
+  <div style="background:#fff;width:94%;max-width:720px;border-radius:20px;padding:20px;margin:20px auto">
+    <h2>จัดการสมาชิก Premium - เจ้าของแอป</h2>
+    <div id="adminPinBox"><input id="adminPin" placeholder="ใส่ PIN เจ้าของแอป: 23229211" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:12px"><button onclick="checkAdminPin()" style="width:100%;padding:12px;border:none;border-radius:12px;background:#7c3aed;color:#fff;font-weight:bold;margin-top:8px">ปลดล็อก</button><p style="font-size:12px;color:#888">PIN จำลอง: 23229211</p></div>
+    <div id="adminContent" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0">
+        <div style="background:#eff6ff;padding:14px;border-radius:12px"><b id="statPremium">0</b><br><span style="font-size:12px">Premium ทั้งหมด</span></div>
+        <div style="background:#f0fdf4;padding:14px;border-radius:12px"><b id="statRevenue">0 ฿</b><br><span style="font-size:12px">รายได้เดือนนี้</span></div>
+        <div style="background:#fefce8;padding:14px;border-radius:12px"><b id="statTrial">0</b><br><span style="font-size:12px">กำลังทดลองฟรี</span></div>
+        <div style="background:#fef2f2;padding:14px;border-radius:12px"><b id="statExpire">0</b><br><span style="font-size:12px">จะหมดอายุใน 7 วัน</span></div>
+      </div>
+      <input id="adminSearch" oninput="renderAdmin()" placeholder="ค้นหาสมาชิก ชื่อ / อีเมล / เบอร์" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:12px">
+      <div style="display:flex;gap:8px;margin:10px 0"><select id="adminFilterStatus" onchange="renderAdmin()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #ddd"><option value="">ทุกสถานะ</option><option>Premium</option><option>ทดลองฟรี</option><option>หมดอายุ</option><option>ยกเลิก</option></select><select id="adminFilterPlan" onchange="renderAdmin()" style="flex:1;padding:10px;border-radius:10px;border:1px solid #ddd"><option value="">ทุกแพ็กเกจ</option><option>รายเดือน</option><option>รายปี</option><option>ทดลองฟรี</option></select></div>
+      <div id="adminTable"></div>
+      <div style="background:#f8fafc;padding:12px;border-radius:12px;margin-top:12px"><b>เพิ่มสมาชิกใหม่ด้วยมือ</b><br><input id="newMemberName" placeholder="ชื่อ" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin-top:8px"><input id="newMemberEmail" placeholder="อีเมล" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin-top:6px"><select id="newMemberPlan" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin-top:6px"><option>รายเดือน</option><option>รายปี</option><option>ทดลองฟรี</option></select><button onclick="addMember()" style="width:100%;padding:12px;border:none;border-radius:12px;background:#111;color:#fff;font-weight:bold;margin-top:8px">เพิ่มสมาชิก</button></div>
+    </div>
+    <button onclick="closeAdmin()" style="width:100%;padding:10px;border:none;background:none;color:#666;margin-top:10px">ปิด</button>
+  </div>
+</div>
+
+<!-- MAPS / NAVIGATION -->
+<div id="mapsBox" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:14px;margin:14px 0">
+  <h3 style="margin:0 0 8px">🧭 นำทางไปร้าน / จุดรับพัสดุ</h3>
+  <p style="font-size:13px;color:#666;margin:0 0 10px">ตัวอย่างร้าน: Cafe Community - นครชัยศรี</p>
+  <div style="border-radius:12px;overflow:hidden"><iframe width="100%" height="220" style="border:0" loading="lazy" src="https://maps.google.com/maps?q=Cafe%20Community%20Nakhon%20Chai%20Si&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button onclick="openMaps('driving')" style="flex:1;padding:11px;border:none;border-radius:10px;background:#111;color:#fff;font-weight:bold">🚗 รถยนต์</button>
+    <button onclick="openMaps('walking')" style="flex:1;padding:11px;border:1px solid #ddd;border-radius:10px;background:#fff">🚶 เดิน</button>
+    <button onclick="openMaps('bicycling')" style="flex:1;padding:11px;border:1px solid #ddd;border-radius:10px;background:#fff">🛵 มอเตอร์ไซค์</button>
+    <button onclick="openMaps('transit')" style="flex:1;padding:11px;border:1px solid #ddd;border-radius:10px;background:#fff">🚌 รถโดยสาร</button>
+  </div>
+  <button onclick="openStreetView()" style="width:100%;padding:12px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:bold;margin-top:8px">👁️ เปิด Street View ดูภาพจริงหน้าร้าน</button>
+</div>
+
+<script>
+let currentUser = JSON.parse(localStorage.getItem('tt_user')||'null');
+let members = JSON.parse(localStorage.getItem('tt_members')||'null') || [
+ {name:'สมชาย ใจดี',email:'somchai@gmail.com',plan:'รายเดือน',status:'Premium',expire:'2026-12-01',revenue:30},
+ {name:'สมหญิง รักดี',email:'somying@gmail.com',plan:'รายปี',status:'Premium',expire:'2027-05-20',revenue:249},
+ {name:'ณัฐวุฒิ พานทอง',email:'bank@gmail.com',plan:'ทดลองฟรี',status:'ทดลองฟรี',expire:'2026-11-16',revenue:0},
+ {name:'มานะ ดีมาก',email:'mana@gmail.com',plan:'รายเดือน',status:'หมดอายุ',expire:'2026-10-01',revenue:0},
+ {name:'ปิติ ชอบช้อป',email:'piti@gmail.com',plan:'รายปี',status:'ยกเลิก',expire:'2026-09-01',revenue:0},
+ {name:'อรทัย สายช้อป',email:'ornthai@gmail.com',plan:'รายเดือน',status:'Premium',expire:'2026-11-18',revenue:30},
+];
+function saveMembers(){ localStorage.setItem('tt_members', JSON.stringify(members)); }
+function updateProfileUI(){
+  let el=document.getElementById('profileInfo');
+  if(!el) return;
+  el.innerHTML = currentUser ? '👤 ล็อกอินแล้ว: <b>'+(currentUser.name||currentUser.email)+'</b><br><span style="font-size:12px;color:#666">'+(currentUser.email||'')+' • '+ (currentUser.method||'') +'</span>' : 'ยังไม่ล็อกอิน - ล็อกอินเพื่อบันทึกพัสดุ / สมัคร Premium';
+}
+function openLogin(){ document.getElementById('loginModal').style.display='flex'; }
+function closeLogin(){ document.getElementById('loginModal').style.display='none'; }
+function requireLogin(){ if(!currentUser){ alert('กรุณาล็อกอินก่อน'); openLogin(); return false; } return true; }
+function doLoginEmail(){
+  let email=document.getElementById('loginEmail').value.trim();
+  if(!email){ alert('ใส่อีเมลก่อน'); return; }
+  currentUser={name:email.split('@')[0], email:email, method:'อีเมล'}; localStorage.setItem('tt_user', JSON.stringify(currentUser)); updateProfileUI(); closeLogin(); alert('ล็อกอินสำเร็จ ยินดีต้อนรับ '+currentUser.name);
+}
+function doLoginGoogle(){
+  currentUser={name:'ผู้ใช้ Google', email:'google.user@gmail.com', method:'Google'}; localStorage.setItem('tt_user', JSON.stringify(currentUser)); updateProfileUI(); closeLogin(); alert('ล็อกอินด้วย Google สำเร็จ (โหมดจำลอง)');
+}
+function sendOTP(){ document.getElementById('otpBox').style.display='block'; alert('ส่ง OTP แล้ว (จำลอง) รหัสคือ 123456'); }
+function doLoginOTP(){
+  let v=document.getElementById('loginOTP').value.trim();
+  if(v!=='123456'){ alert('รหัส OTP ไม่ถูกต้อง ลองใส่ 123456'); return; }
+  let phone=document.getElementById('loginPhone').value.trim()||'08x-xxx-xxxx';
+  currentUser={name:'ผู้ใช้ '+phone, email:phone, method:'เบอร์โทร + OTP'}; localStorage.setItem('tt_user', JSON.stringify(currentUser)); updateProfileUI(); closeLogin(); alert('ยืนยัน OTP สำเร็จ');
+}
+function logout(){ currentUser=null; localStorage.removeItem('tt_user'); updateProfileUI(); alert('ออกจากระบบแล้ว'); }
+// Guard: wrap original track() and premium
+let _origTrack = window.track;
+window.track = function(){ if(!requireLogin()) return; return _origTrack(); };
+function openAdmin(){ document.getElementById('adminModal').style.display='block'; }
+function closeAdmin(){ document.getElementById('adminModal').style.display='none'; }
+function checkAdminPin(){
+  if(document.getElementById('adminPin').value.trim()==='23229211'){ document.getElementById('adminPinBox').style.display='none'; document.getElementById('adminContent').style.display='block'; renderAdmin(); }
+  else alert('PIN ไม่ถูกต้อง');
+}
+function renderAdmin(){
+  let q=(document.getElementById('adminSearch').value||'').toLowerCase();
+  let fs=document.getElementById('adminFilterStatus').value;
+  let fp=document.getElementById('adminFilterPlan').value;
+  let list=members.filter(m=> (!q|| (m.name+m.email).toLowerCase().includes(q)) && (!fs||m.status===fs) && (!fp||m.plan===fp));
+  document.getElementById('statPremium').textContent = members.filter(m=>m.status==='Premium').length;
+  document.getElementById('statRevenue').textContent = members.reduce((s,m)=>s+(m.revenue||0),0)+' ฿';
+  document.getElementById('statTrial').textContent = members.filter(m=>m.status==='ทดลองฟรี').length;
+  document.getElementById('statExpire').textContent = members.filter(m=>{ let d=new Date(m.expire); let now=new Date(); let diff=(d-now)/86400000; return diff>=0 && diff<=7; }).length;
+  document.getElementById('adminTable').innerHTML = list.map((m,i)=> '<div style="border:1px solid #eee;border-radius:12px;padding:10px;margin:6px 0"><b>'+m.name+'</b> • '+m.email+'<br><span style="font-size:12px">'+m.plan+' • '+m.status+' • หมดอายุ '+m.expire+'</span><br><div style="display:flex;gap:6px;margin-top:8px"><button onclick="renewMember('+members.indexOf(m)+')" style="padding:8px 10px;border:none;border-radius:8px;background:#16a34a;color:#fff">ต่ออายุ</button><button onclick="cancelMember('+members.indexOf(m)+')" style="padding:8px 10px;border:1px solid #ddd;border-radius:8px;background:#fff">ยกเลิก</button><button onclick="deleteMember('+members.indexOf(m)+')" style="padding:8px 10px;border:none;border-radius:8px;background:#fee2e2">ลบ</button></div></div>').join('') || '<p style="color:#888">ไม่พบสมาชิก</p>';
+}
+function renewMember(i){ members[i].status='Premium'; members[i].expire='2027-01-01'; saveMembers(); renderAdmin(); alert('ต่ออายุให้ '+members[i].name+' แล้ว'); }
+function cancelMember(i){ members[i].status='ยกเลิก'; saveMembers(); renderAdmin(); }
+function deleteMember(i){ if(confirm('ลบ '+members[i].name+' ?')){ members.splice(i,1); saveMembers(); renderAdmin(); } }
+function addMember(){
+  let n=document.getElementById('newMemberName').value.trim()||'สมาชิกใหม่';
+  let e=document.getElementById('newMemberEmail').value.trim()||'new@gmail.com';
+  let p=document.getElementById('newMemberPlan').value;
+  members.unshift({name:n,email:e,plan:p,status:p==='ทดลองฟรี'?'ทดลองฟรี':'Premium',expire:'2026-12-31',revenue:p==='รายเดือน'?30:p==='รายปี'?249:0}); saveMembers(); renderAdmin(); alert('เพิ่มสมาชิกแล้ว');
+}
+// Maps
+function openMaps(mode){
+  let dest='Cafe Community Nakhon Chai Si';
+  let travel = mode==='walking'?'walking':mode==='transit'?'transit':mode==='bicycling'?'bicycling':'driving';
+  window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(dest)+'&travelmode='+travel, '_blank');
+}
+function openStreetView(){
+  window.open('https://www.google.com/maps/@13.8,100.2,3a,75y,0h,90t/data=!3m6!1e1!3m4!1s!2e0!7i16384!8i8192', '_blank');
+}
+// Guard premium buttons
+document.addEventListener('DOMContentLoaded', ()=>{
+  updateProfileUI();
+  // attach guard to premium buttons if they exist
+  document.querySelectorAll('[onclick*="show(\'premium\')"]').forEach(b=>{
+    let orig=b.getAttribute('onclick'); b.setAttribute('onclick', "if(!requireLogin())return;"+orig);
+  });
+});
+updateProfileUI();
+</script>
+</body></html>
