@@ -44,9 +44,14 @@ jobs:
           # เพิ่ม signingConfigs ถ้ายังไม่มี
           if "signingConfigs" not in t:
               t = t.replace("android {", "android {\n    signingConfigs {\n        release {\n            storeFile file('upload-keystore.jks')\n            storePassword 'trackthai123'\n            keyAlias 'upload'\n            keyPassword 'trackthai123'\n        }\n    }", 1)
-          # ให้ buildType release ใช้ signingConfigs.release
+          # ให้ buildType release ใช้ signingConfigs.release - หาใน buildTypes เท่านั้น
           if "signingConfig signingConfigs.release" not in t:
-              t = t.replace("release {", "release {\n            signingConfig signingConfigs.release", 1)
+              bi = t.find("buildTypes")
+              if bi != -1:
+                  ri = t.find("release {", bi)
+                  if ri != -1:
+                      insert_at = ri + len("release {")
+                      t = t[:insert_at] + "\n            signingConfig signingConfigs.release" + t[insert_at:]
           p.write_text(t)
           print("Patched build.gradle")
           PY
