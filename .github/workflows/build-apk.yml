@@ -38,7 +38,7 @@ jobs:
           storeFile=upload-keystore.jks
           EOF
           python3 <<'PY'
-          import pathlib
+          import pathlib, re
           p = pathlib.Path("android/app/build.gradle")
           t = p.read_text()
           # เพิ่ม signingConfigs ถ้ายังไม่มี
@@ -52,8 +52,18 @@ jobs:
                   if ri != -1:
                       insert_at = ri + len("release {")
                       t = t[:insert_at] + "\n            signingConfig signingConfigs.release" + t[insert_at:]
+          # อัปเดต targetSdk เป็น 36 ตามที่ Google บังคับ
+          t = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 36', t)
+          t = re.sub(r'targetSdk\s+\d+', 'targetSdk 36', t)
+          # อัปเดตใน variables.gradle ด้วยถ้ามี
+          vg = pathlib.Path("android/variables.gradle")
+          if vg.exists():
+              vt = vg.read_text()
+              vt = re.sub(r'targetSdkVersion\s*=\s*\d+', 'targetSdkVersion = 36', vt)
+              vt = re.sub(r'targetSdk\s*=\s*\d+', 'targetSdk = 36', vt)
+              vg.write_text(vt)
           p.write_text(t)
-          print("Patched build.gradle")
+          print("Patched build.gradle to targetSdk 36")
           PY
       - name: Build AAB
         run: |
